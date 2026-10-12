@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <!-- Configuración básica de la página -->
+    <meta charset="UTF-8">
+    <!-- Esta línea hace que la página se adapte al ancho del celular -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Onda Azul Records — Tienda de vinilos</title>
+    <meta name="description" content="Tienda online de discos de vinilo de pop en inglés y en español.">
+
+    <!-- Tipografías de Google Fonts: Righteous (títulos) y Poppins (texto) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&family=Righteous&display=swap" rel="stylesheet">
+
+    <!-- Ícono de la pestaña del navegador: el mismo logo -->
+    <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+
+    <!-- Nuestra hoja de estilos -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- ===================== ENCABEZADO ===================== -->
+    <header class="header">
+        <!-- Logo y nombre de la tienda -->
+        <a href="index.html" class="logo">
+            <!-- Logo: estrella azul en SVG (archivo img/logo.svg).
+                 alt vacío porque al lado ya dice el nombre de la tienda. -->
+            <img class="logo-icono" src="img/logo.svg" alt="" width="48" height="48">
+            <span class="logo-texto">Onda Azul Records</span>
+        </a>
+
+        <!-- Buscador de productos -->
+        <div class="buscador">
+            <label for="buscador" class="oculto">Buscar discos</label>
+            <input type="search" id="buscador" placeholder="Buscar disco o artista...">
+        </div>
+
+        <!-- Botones del encabezado: modo oscuro, favoritos y carrito -->
+        <div class="header-botones">
+            <button type="button" id="boton-modo-oscuro" class="boton-icono" aria-label="Activar modo oscuro">🌙</button>
+
+            <button type="button" id="boton-favoritos" class="boton-icono" aria-label="Ver favoritos">
+                ❤️ <span id="contador-favoritos" class="contador">0</span>
+            </button>
+
+            <button type="button" id="boton-carrito" class="boton-icono" aria-label="Ver carrito" aria-controls="carrito" aria-expanded="false">
+                🛒 <span id="contador-carrito" class="contador">0</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ===================== MENÚ DE CATEGORÍAS ===================== -->
+    <!-- Cada botón guarda su categoría en "data-categoria". Lo vamos a leer con JavaScript. -->
+    <nav class="categorias" aria-label="Categorías">
+        <button type="button" class="categoria activa" data-categoria="todas">Todas</button>
+        <button type="button" class="categoria" data-categoria="pop-ingles">Pop en inglés</button>
+        <button type="button" class="categoria" data-categoria="pop-espanol">Pop en español</button>
+        <button type="button" class="categoria" data-categoria="pop-latino">Pop latino</button>
+        <button type="button" class="categoria" data-categoria="clasicos">Clásicos 80s y 90s</button>
+        <button type="button" class="categoria" data-categoria="novedades">Novedades</button>
+    </nav>
+
+    <!-- ===================== CONTENIDO PRINCIPAL ===================== -->
+    <main class="principal">
+
+        <!-- Panel de filtros -->
+        <section class="filtros" aria-labelledby="titulo-filtros">
+            <!-- <details> se abre y se cierra solo al tocar el <summary>.
+                 En el celular arranca cerrado; en tablet y compu, JavaScript lo deja siempre abierto. -->
+            <details id="filtros-plegable" open>
+                <summary class="filtros-titulo">
+                    <h2 id="titulo-filtros">Filtros</h2>
+                </summary>
+
+                <div class="filtros-contenido">
+                    <!-- Filtro por idioma -->
+                    <label for="filtro-idioma">Idioma</label>
+                    <select id="filtro-idioma">
+                        <option value="todos">Todos</option>
+                        <option value="Inglés">Inglés</option>
+                        <option value="Español">Español</option>
+                    </select>
+
+                    <!-- Filtro por década -->
+                    <label for="filtro-decada">Década</label>
+                    <select id="filtro-decada">
+                        <option value="todas">Todas</option>
+                        <option value="1980">Años 80</option>
+                        <option value="1990">Años 90</option>
+                        <option value="2000">Años 2000</option>
+                        <option value="2010">Años 2010</option>
+                        <option value="2020">Años 2020</option>
+                    </select>
+
+                    <!-- Filtro por precio máximo -->
+                    <label for="filtro-precio">Precio máximo ($)</label>
+                    <input type="number" id="filtro-precio" min="0" step="1000" placeholder="Ej: 55000">
+
+                    <button type="button" id="boton-limpiar-filtros" class="boton boton-secundario">Limpiar filtros</button>
+                </div>
+            </details>
+        </section>
+
+        <!-- Listado de productos -->
+        <section class="productos" aria-labelledby="titulo-productos">
+            <h2 id="titulo-productos">Nuestros vinilos</h2>
+            <!-- Acá JavaScript dibuja las tarjetas de los discos (mostrarProductos) -->
+            <div id="contenedor-productos" class="grilla-productos"></div>
+            <!-- Mensaje que se muestra si la búsqueda o los filtros no encuentran nada -->
+            <p id="sin-resultados" class="sin-resultados" hidden>No encontramos discos con esos filtros 😕</p>
+        </section>
+
+        <!-- Carrito de compras -->
+        <!-- En celular y tablet es un panel que entra desde la derecha;
+             en la compu es la tercera columna, como siempre. -->
+        <aside id="carrito" class="carrito" aria-labelledby="titulo-carrito">
+            <div class="carrito-encabezado">
+                <h2 id="titulo-carrito">Tu carrito</h2>
+                <!-- Botón para cerrar el panel (solo se ve en celular y tablet) -->
+                <button type="button" id="boton-cerrar-carrito" class="boton-cerrar" aria-label="Cerrar carrito">✕</button>
+            </div>
+
+            <!-- Acá JavaScript dibuja los discos del carrito (mostrarCarrito) -->
+            <ul id="lista-carrito" class="lista-carrito"></ul>
+            <p id="carrito-vacio" class="carrito-vacio">El carrito está vacío.</p>
+
+            <!-- Cupón de descuento (funcionalidad opcional) -->
+            <form id="form-cupon" class="cupon">
+                <label for="input-cupon">Cupón de descuento</label>
+                <input type="text" id="input-cupon" placeholder="Ingresá tu cupón">
+                <button type="submit" class="boton boton-secundario">Aplicar</button>
+            </form>
+
+            <!-- Estado del cupón: se ve solo cuando hay un cupón aplicado -->
+            <div id="estado-cupon" class="estado-cupon" hidden>
+                <span id="texto-cupon"></span>
+                <button type="button" id="boton-quitar-cupon" class="boton-quitar-cupon">Quitar</button>
+            </div>
+
+            <!-- Resumen de precios -->
+            <div class="resumen">
+                <p>Subtotal: <span id="subtotal">$0</span></p>
+                <p>Descuento: <span id="descuento">$0</span></p>
+                <p class="total">Total: <span id="total">$0</span></p>
+            </div>
+
+            <button type="button" id="boton-vaciar" class="boton boton-secundario">Vaciar carrito</button>
+            <button type="button" id="boton-comprar" class="boton">Finalizar compra</button>
+        </aside>
+    </main>
+
+    <!-- Fondo oscuro que aparece detrás del carrito abierto (celular y tablet).
+         Tocarlo cierra el carrito. -->
+    <div id="fondo-carrito" class="fondo-carrito"></div>
+
+    <!-- Cartelito de mensajes para el usuario (ej: "Agregado al carrito ✓"). Lo maneja mostrarMensaje. -->
+    <div id="mensaje" class="mensaje" role="status" aria-live="polite"></div>
+
+    <!-- ===================== PIE DE PÁGINA ===================== -->
+    <footer class="footer">
+        <p>© 2026 Onda Azul Records — Proyecto escolar</p>
+        <p>Las tapas pertenecen a sus artistas y sellos discográficos. Uso educativo.</p>
+    </footer>
+
+    <!-- Scripts: primero la lista de productos, después el código que la usa -->
+    <script src="productos.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

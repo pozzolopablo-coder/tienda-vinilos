@@ -1,0 +1,964 @@
+/* =====================================================
+   styles.css — Diseño de Onda Azul Records
+   Orden del archivo:
+     1. Variables (colores, fuentes, medidas)
+     2. Estilos generales
+     3. Header
+     4. Categorías
+     5. Distribución principal (filtros, productos, carrito)
+     6. Filtros
+     7. Tarjetas de productos
+     8. Botones
+     9. Carrito
+    10. Footer
+    11. Responsive (tablet y computadora)
+   ===================================================== */
+
+
+/* ========== 1. VARIABLES ========== */
+/* Los nombres dicen PARA QUÉ se usa cada color, no qué color es.
+   Así, en el modo oscuro solo cambiamos los valores. */
+:root {
+    /* Paleta de la tienda */
+    --color-header: #0B1D3A;   /* azul noche: header y footer */
+    --color-titulos: #1E3A8A;  /* azul marino */
+    --color-boton: #2563EB;    /* azul eléctrico */
+    --color-detalle: #60A5FA;  /* celeste: hover y detalles */
+    --color-tarjeta: #DBEAFE;  /* celeste muy claro */
+    --color-fondo: #F5F9FF;    /* blanco azulado */
+    --color-acento: #FACC15;   /* amarillo: ofertas y contador */
+
+    /* Colores de apoyo */
+    --color-texto: #0B1D3A;        /* texto normal */
+    --color-texto-suave: #475569;  /* texto secundario (artista, detalles) */
+    --color-texto-claro: #FFFFFF;  /* texto sobre fondos oscuros */
+    --color-panel: #FFFFFF;        /* fondo de filtros y carrito */
+    --color-secundario: #2563EB;   /* texto y borde de los botones con borde */
+    --color-texto-hover: #0B1D3A;  /* texto sobre el celeste del hover (igual en los dos modos) */
+
+    /* Tamaño mínimo de un botón para tocarlo cómodo con el dedo */
+    --tamano-toque: 44px;
+
+    /* Tipografías */
+    --fuente-titulos: "Righteous", cursive;
+    --fuente-texto: "Poppins", sans-serif;
+
+    /* Bordes redondeados y sombra */
+    --radio: 12px;
+    --sombra: 0 4px 12px rgba(11, 29, 58, 0.12);
+}
+
+/* ----- Modo oscuro -----
+   Cuando JavaScript le pone la clase "modo-oscuro" al <body>,
+   estas variables REEMPLAZAN a las de :root para todo lo que está
+   adentro del body (o sea, toda la página). Las reglas de abajo
+   no cambian: siguen usando var(--...), pero ahora valen otro color. */
+body.modo-oscuro {
+    /* De la paleta, intercambiados: lo claro pasa a ser texto */
+    --color-fondo: #0B1D3A;        /* azul noche */
+    --color-tarjeta: #1E3A8A;      /* azul marino */
+    --color-titulos: #DBEAFE;      /* celeste muy claro */
+    --color-texto: #F5F9FF;        /* blanco azulado */
+
+    /* Tonos nuevos (derivados de los mismos azules) */
+    --color-header: #050D1C;       /* más oscuro que el fondo, para que se distinga */
+    --color-panel: #132B57;        /* filtros y carrito: entre el fondo y las tarjetas */
+    --color-texto-suave: #A9BCD8;  /* gris celeste que se lee sobre azul */
+
+    /* Los botones con borde pasan a celeste: el azul eléctrico
+       no se leería sobre los fondos oscuros */
+    --color-secundario: #60A5FA;
+
+    /* --color-boton, --color-detalle y --color-acento quedan iguales */
+
+    --sombra: 0 4px 12px rgba(0, 0, 0, 0.4);
+
+    /* Le avisa al navegador que pinte oscuros sus propios controles
+       (la lista de los select, las barras de desplazamiento) */
+    color-scheme: dark;
+}
+
+/* Una excepción: en modo claro el hover de los botones del header usa --color-titulos,
+   que en oscuro es casi blanco: usamos el azul marino de las tarjetas */
+body.modo-oscuro .boton-icono:hover {
+    background-color: var(--color-tarjeta);
+}
+
+
+/* ========== 2. ESTILOS GENERALES ========== */
+
+/* box-sizing: border-box hace que el padding y el borde
+   se cuenten DENTRO del ancho. Así es más fácil calcular medidas. */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: var(--fuente-texto);
+    background-color: var(--color-fondo);
+    color: var(--color-texto);
+    line-height: 1.5;
+}
+
+h1, h2, h3 {
+    font-family: var(--fuente-titulos);
+    font-weight: normal; /* Righteous ya es gruesa */
+    color: var(--color-titulos);
+    margin-top: 0;
+}
+
+/* Los botones, inputs y selects no heredan la fuente solos: se la pasamos */
+button, input, select {
+    font-family: inherit;
+    font-size: 1rem;
+}
+
+/* Clase para ocultar algo a la vista pero que los lectores de pantalla
+   (para personas ciegas) sí lo lean. La usa el label del buscador. */
+.oculto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+
+/* ========== 3. HEADER ========== */
+.header {
+    background-color: var(--color-header);
+    color: var(--color-texto-claro);
+    padding: 12px 16px;
+    display: flex;            /* pone los elementos en fila */
+    flex-wrap: wrap;          /* si no entran, bajan a otra línea */
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-texto-claro);
+    text-decoration: none;    /* saca el subrayado del link */
+}
+
+.logo-texto {
+    font-family: var(--fuente-titulos);
+    font-size: 1.4rem;
+}
+
+/* El dibujo del logo (img/logo.svg) */
+.logo-icono {
+    display: block;
+    flex-shrink: 0;             /* en el celular no se achica */
+    transition: transform 0.5s; /* gira suave */
+}
+
+/* Al pasar el mouse por el logo, la estrella gira 72°.
+   72 = 360 / 5 puntas: termina en la misma posición, como si fuera un disco girando */
+.logo:hover .logo-icono {
+    transform: rotate(72deg);
+}
+
+/* En celular el buscador ocupa toda una línea (order lo manda al final) */
+.buscador {
+    order: 3;
+    width: 100%;
+}
+
+.buscador input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid transparent;
+    border-radius: var(--radio);
+    background-color: var(--color-panel);
+    color: var(--color-texto);
+}
+
+/* :focus = cuando el usuario hace clic o entra con Tab al campo */
+.buscador input:focus {
+    outline: none;
+    border-color: var(--color-detalle);
+}
+
+.header-botones {
+    display: flex;
+    gap: 8px;
+}
+
+.boton-icono {
+    background: transparent;
+    border: 2px solid var(--color-detalle);
+    border-radius: var(--radio);
+    color: var(--color-texto-claro);
+    padding: 6px 10px;
+    min-width: var(--tamano-toque);   /* cómodo para el dedo */
+    min-height: var(--tamano-toque);
+    cursor: pointer;          /* manito al pasar el mouse */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+.boton-icono:hover {
+    background-color: var(--color-titulos);
+}
+
+/* Botón del header "encendido" (ej: ❤️ cuando se ven los favoritos) */
+.boton-icono.activo {
+    background-color: var(--color-boton);
+    border-color: var(--color-boton);
+}
+
+/* Contadores de favoritos y carrito (circulito amarillo) */
+.contador {
+    background-color: var(--color-acento);
+    color: var(--color-header);
+    font-size: 0.8rem;
+    font-weight: 600;
+    min-width: 22px;
+    padding: 0 6px;
+    border-radius: 999px;     /* número muy grande = bordes totalmente redondos */
+    text-align: center;
+}
+
+
+/* ========== 4. CATEGORÍAS ========== */
+.categorias {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow-x: auto;         /* en celular se desliza de costado */
+    background-color: var(--color-panel);
+    box-shadow: var(--sombra);
+}
+
+.categoria {
+    flex-shrink: 0;           /* que los botones no se achiquen */
+    background-color: var(--color-tarjeta);
+    color: var(--color-titulos);
+    border: none;
+    border-radius: 999px;
+    padding: 8px 16px;
+    min-height: var(--tamano-toque);  /* cómodo para el dedo */
+    cursor: pointer;
+    white-space: nowrap;      /* el texto no se corta en dos líneas */
+}
+
+/* Hover: celeste con texto azul noche (el blanco sobre celeste no se leía bien) */
+.categoria:hover {
+    background-color: var(--color-detalle);
+    color: var(--color-texto-hover);
+}
+
+/* La categoría elegida (JavaScript le pone la clase "activa") */
+.categoria.activa {
+    background-color: var(--color-boton);
+    color: var(--color-texto-claro);
+}
+
+
+/* ========== 5. DISTRIBUCIÓN PRINCIPAL ========== */
+/* En celular: una sola columna (filtros, productos y carrito apilados) */
+.principal {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 20px 16px;
+    max-width: 1300px;        /* en pantallas enormes no se estira de más */
+    margin: 0 auto;           /* centra el contenido */
+}
+
+
+/* ========== 6. FILTROS ========== */
+.filtros {
+    background-color: var(--color-panel);
+    padding: 16px;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    align-self: start;        /* no se estira hasta abajo */
+}
+
+/* El <summary> con el título "Filtros".
+   list-style: none y ::-webkit-details-marker sacan el triangulito
+   que el navegador le pone solo a los <summary>. */
+.filtros-titulo {
+    list-style: none;
+}
+
+.filtros-titulo::-webkit-details-marker {
+    display: none;
+}
+
+/* Los controles de los filtros, uno abajo del otro */
+.filtros-contenido {
+    display: flex;
+    flex-direction: column;   /* uno abajo del otro */
+    gap: 6px;
+    padding-top: 6px;         /* el mismo espacio que había entre el título y "Idioma" */
+}
+
+.filtros label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-top: 6px;
+}
+
+.filtros select,
+.filtros input,
+.cupon input {
+    padding: 8px 10px;
+    border: 2px solid var(--color-tarjeta);
+    border-radius: 8px;
+    background-color: var(--color-panel);
+    color: var(--color-texto);
+}
+
+.filtros select:focus,
+.filtros input:focus,
+.cupon input:focus {
+    outline: none;
+    border-color: var(--color-detalle);
+}
+
+.filtros .boton {
+    margin-top: 12px;
+}
+
+
+/* ========== 7. TARJETAS DE PRODUCTOS ========== */
+
+/* Grilla automática: entran tantas tarjetas como quepan,
+   cada una de mínimo 160px. No hace falta media query para esto. */
+.grilla-productos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
+}
+
+.tarjeta {
+    position: relative;       /* para ubicar el botón de favorito encima */
+    background-color: var(--color-tarjeta);
+    border-radius: var(--radio);
+    overflow: hidden;         /* la tapa respeta los bordes redondeados */
+    box-shadow: var(--sombra);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s; /* animación suave al pasar el mouse */
+}
+
+.tarjeta:hover {
+    transform: translateY(-4px); /* la tarjeta "sube" un poquito */
+}
+
+/* La tapa del disco: un cuadrado con el degradado de cada producto.
+   El degradado se lo pone JavaScript con style="background: ..." */
+.tapa {
+    position: relative;
+    aspect-ratio: 1 / 1;      /* siempre cuadrada, como un vinilo */
+    display: flex;
+    align-items: flex-end;
+    padding: 12px;
+    overflow: hidden;
+}
+
+/* ::after crea un elemento "falso" sin tocar el HTML.
+   Lo usamos para dibujar un vinilo que asoma en la tapa. */
+.tapa::after {
+    content: "";
+    position: absolute;
+    width: 60%;
+    aspect-ratio: 1 / 1;
+    top: 10%;
+    right: -20%;
+    border-radius: 50%;       /* círculo */
+    /* círculos concéntricos: centro de color, surcos negros */
+    background: radial-gradient(circle,
+        var(--color-acento) 0 12%,
+        #111 13% 30%,
+        #333 31% 32%,
+        #111 33% 50%,
+        #333 51% 52%,
+        #111 53%);
+    opacity: 0.85;
+}
+
+/* Nombre del disco escrito sobre la tapa */
+.tapa-titulo {
+    position: relative;
+    z-index: 1;               /* queda por encima del vinilo */
+    font-family: var(--fuente-titulos);
+    color: var(--color-texto-claro);
+    font-size: 1.1rem;
+    text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Foto real de la tapa: cubre todo el cuadrado y queda POR ENCIMA
+   del degradado, del vinilo y del nombre (z-index más alto).
+   Si no carga, JavaScript la borra y se ve lo que estaba debajo. */
+.tapa-imagen {
+    position: absolute;
+    inset: 0;                 /* top, right, bottom y left en 0: ocupa todo */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;        /* llena el cuadrado sin deformarse */
+    z-index: 2;
+}
+
+.tarjeta-info {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-grow: 1;             /* ocupa el espacio que sobra */
+}
+
+/* Cartelito con la categoría */
+.etiqueta-categoria {
+    align-self: flex-start;
+    font-size: 0.8rem;
+    background-color: var(--color-panel);
+    color: var(--color-titulos);
+    padding: 2px 8px;
+    border-radius: 999px;
+}
+
+.tarjeta-nombre {
+    font-size: 1.05rem;
+    margin: 6px 0 0;
+}
+
+.tarjeta-artista {
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 0.9rem;
+}
+
+.tarjeta-detalle {
+    margin: 0;
+    color: var(--color-texto-suave);
+    font-size: 0.85rem;
+}
+
+.tarjeta-precio {
+    /* arriba auto: empuja el precio y el botón hacia abajo; abajo 8px */
+    margin: auto 0 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-titulos);
+}
+
+/* Corazón de favoritos arriba a la izquierda de la tarjeta
+   (a la derecha está el vinilo que asoma) */
+.boton-favorito {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 3;               /* por encima de la foto de la tapa */
+    background-color: var(--color-panel);
+    border: none;
+    border-radius: 50%;
+    width: var(--tamano-toque);   /* cómodo para el dedo */
+    height: var(--tamano-toque);
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: var(--sombra);
+    transition: transform 0.2s;   /* el agrandado del hover es suave */
+}
+
+.boton-favorito:hover {
+    transform: scale(1.1);
+}
+
+.sin-resultados {
+    text-align: center;
+    color: var(--color-texto-suave);
+    padding: 20px;
+}
+
+
+/* ========== 8. BOTONES ========== */
+.boton {
+    background-color: var(--color-boton);
+    color: var(--color-texto-claro);
+    border: none;
+    border-radius: var(--radio);
+    padding: 10px 16px;
+    min-height: var(--tamano-toque);  /* cómodo para el dedo */
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+/* Hover: celeste con texto azul noche (el blanco sobre celeste no se leía bien).
+   :not(:disabled) = solo si el botón NO está desactivado */
+.boton:hover:not(:disabled) {
+    background-color: var(--color-detalle);
+    color: var(--color-texto-hover);
+}
+
+/* Variante "secundaria": botón con borde, sin relleno.
+   Usa --color-secundario, que en modo oscuro pasa a celeste. */
+.boton-secundario {
+    background-color: transparent;
+    color: var(--color-secundario);
+    border: 2px solid var(--color-secundario);
+}
+
+.boton-secundario:hover:not(:disabled) {
+    border-color: var(--color-detalle);
+}
+
+/* Cuando un botón está desactivado (ej: carrito vacío) */
+.boton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* ========== 9. CARRITO ========== */
+.carrito {
+    background-color: var(--color-panel);
+    padding: 16px;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-self: start;
+}
+
+/* Título del carrito + botón ✕ (el ✕ solo se ve en celular y tablet) */
+.carrito-encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.boton-cerrar {
+    display: none;            /* en la compu no hace falta */
+    width: var(--tamano-toque);
+    height: var(--tamano-toque);
+    flex-shrink: 0;
+    background: transparent;
+    border: 2px solid var(--color-secundario);
+    border-radius: 50%;
+    color: var(--color-secundario);
+    font-size: 1.1rem;
+    cursor: pointer;
+}
+
+.boton-cerrar:hover {
+    background-color: var(--color-detalle);
+    border-color: var(--color-detalle);
+    color: var(--color-texto-hover);
+}
+
+/* Fondo oscuro detrás del carrito abierto: en la compu no existe */
+.fondo-carrito {
+    display: none;
+}
+
+.lista-carrito {
+    list-style: none;         /* saca los puntitos de la lista */
+    margin: 0;
+    padding: 0;
+}
+
+.carrito-vacio {
+    color: var(--color-texto-suave);
+    margin: 0;
+}
+
+/* Cada disco del carrito. Usamos grid con "áreas" con nombre:
+   arriba: tapa | info | eliminar
+   abajo:  tapa | cantidad | subtotal */
+.item-carrito {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    grid-template-areas:
+        "tapa info     eliminar"
+        "tapa cantidad subtotal";
+    gap: 4px 10px;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--color-tarjeta);
+}
+
+.item-tapa {
+    grid-area: tapa;
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.item-tapa img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.item-info {
+    grid-area: info;
+    min-width: 0;             /* deja que el texto largo se corte con "..." */
+}
+
+.item-nombre {
+    margin: 0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    white-space: nowrap;      /* en una sola línea... */
+    overflow: hidden;
+    text-overflow: ellipsis;  /* ...y si no entra, termina en "..." */
+}
+
+.item-artista {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--color-texto-suave);
+}
+
+.boton-eliminar {
+    grid-area: eliminar;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    width: var(--tamano-toque);   /* cómodo para el dedo */
+    height: var(--tamano-toque);
+    border-radius: 8px;
+}
+
+.boton-eliminar:hover {
+    background-color: var(--color-tarjeta);
+}
+
+/* Botones − cantidad + */
+.item-cantidad {
+    grid-area: cantidad;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.item-cantidad span {
+    min-width: 20px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.boton-cantidad {
+    width: var(--tamano-toque);   /* cómodo para el dedo */
+    height: var(--tamano-toque);
+    border-radius: 50%;
+    border: 2px solid var(--color-secundario);
+    background-color: var(--color-panel);
+    color: var(--color-secundario);
+    font-size: 1.2rem;
+    font-weight: 600;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* Mismo hover que los otros botones: celeste con texto azul noche */
+.boton-cantidad:hover:not(:disabled) {
+    background-color: var(--color-detalle);
+    border-color: var(--color-detalle);
+    color: var(--color-texto-hover);
+}
+
+.boton-cantidad:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.item-subtotal {
+    grid-area: subtotal;
+    margin: 0;
+    font-weight: 600;
+    color: var(--color-titulos);
+}
+
+.cupon {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.cupon label {
+    width: 100%;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.cupon input {
+    flex: 1;                  /* el input ocupa el espacio libre */
+    min-width: 0;
+}
+
+/* Línea de estado del cupón (aplicado / cuántos discos faltan) */
+.estado-cupon {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.85rem;
+    background-color: var(--color-tarjeta);
+    color: var(--color-titulos);
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+/* El atributo hidden oculta un elemento, PERO si el CSS le pone
+   display: flex, el flex gana y se seguiría viendo. Con esta regla
+   nos aseguramos de que hidden siempre lo oculte. */
+.estado-cupon[hidden] {
+    display: none;
+}
+
+.boton-quitar-cupon {
+    background: transparent;
+    border: none;
+    color: var(--color-titulos);
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.9rem;
+    min-height: var(--tamano-toque);  /* cómodo para el dedo */
+    padding: 0 10px;
+    flex-shrink: 0;
+}
+
+.resumen {
+    border-top: 2px solid var(--color-tarjeta);
+    padding-top: 8px;
+}
+
+.resumen p {
+    margin: 4px 0;
+    display: flex;
+    justify-content: space-between; /* texto a la izquierda, precio a la derecha */
+}
+
+.resumen .total {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--color-titulos);
+}
+
+
+/* ========== 9b. MENSAJES AL USUARIO ========== */
+/* Cartelito flotante abajo en el centro. Está siempre en la página,
+   pero invisible (opacity: 0) hasta que JavaScript le pone "visible". */
+.mensaje {
+    position: fixed;          /* queda quieto aunque bajes por la página */
+    bottom: 20px;
+    left: 50%;
+    transform: translate(-50%, 20px); /* centrado y un poco más abajo */
+    max-width: calc(100% - 32px);     /* en celular deja 16px a cada lado */
+    padding: 12px 20px;
+    border-radius: var(--radio);
+    box-shadow: var(--sombra);
+    font-weight: 600;
+    text-align: center;
+    z-index: 300;             /* por encima de todo, incluso del carrito abierto */
+
+    /* Colores del mensaje normal: celeste con texto azul noche */
+    background-color: var(--color-detalle);
+    color: var(--color-header);
+
+    /* Escondido */
+    opacity: 0;
+    pointer-events: none;     /* escondido no bloquea clics */
+    transition: opacity 0.3s, transform 0.3s; /* aparece y se va suave */
+}
+
+/* Visible: opaco y sube a su lugar */
+.mensaje.visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+/* Avisos (eliminar, vaciar): amarillo */
+.mensaje.mensaje-aviso {
+    background-color: var(--color-acento);
+}
+
+
+/* ========== 10. FOOTER ========== */
+.footer {
+    background-color: var(--color-header);
+    color: var(--color-texto-claro);
+    text-align: center;
+    padding: 20px 16px;
+    font-size: 0.85rem;
+}
+
+.footer p {
+    margin: 4px 0;
+}
+
+
+/* ========== 11. RESPONSIVE ========== */
+/* Todo lo de arriba es para CELULAR (mobile first).
+   Acá agregamos cambios para pantallas más grandes. */
+
+/* --- Solo celular (hasta 767px): filtros plegables --- */
+/* max-width = "solo si la pantalla mide HASTA este ancho".
+   Así estas reglas no tocan nada en tablet ni en compu. */
+@media (max-width: 767px) {
+    /* Header fijo: al bajar por la página queda pegado arriba,
+       así el buscador, ❤️ y 🛒 siempre están a mano.
+       sticky = se comporta normal hasta llegar a top: 0, y ahí se queda. */
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 100;             /* encima de las tarjetas, debajo del carrito abierto (200) */
+    }
+
+    /* La barra "Filtros" se puede tocar: manito y alto cómodo para el dedo */
+    .filtros-titulo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        min-height: var(--tamano-toque);
+        cursor: pointer;
+    }
+
+    .filtros-titulo h2 {
+        margin: 0;
+    }
+
+    /* Flechita a la derecha: ::after agrega contenido sin tocar el HTML */
+    .filtros-titulo::after {
+        content: "▾";
+        font-size: 1.4rem;
+        color: var(--color-titulos);
+        transition: transform 0.3s;
+    }
+
+    /* Con el panel abierto ([open]), la flechita apunta para arriba */
+    #filtros-plegable[open] .filtros-titulo::after {
+        transform: rotate(180deg);
+    }
+}
+
+/* --- Solo tablet (de 768px a 1023px): controles de los filtros cómodos para el dedo --- */
+/* "and" = se tienen que cumplir las dos condiciones a la vez */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .filtros select,
+    .filtros input {
+        min-height: var(--tamano-toque);
+    }
+}
+
+/* --- Celular y tablet (hasta 1023px): carrito como panel deslizable --- */
+@media (max-width: 1023px) {
+    /* El carrito se pega a la derecha de la ventana, con todo el alto,
+       y se esconde corrido hacia afuera (translateX 100% = su propio ancho) */
+    .carrito {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(380px, 88vw);  /* el más chico de los dos: 380px o el 88% de la pantalla */
+        /* El carrito tiene align-self: start (para que en la compu no se estire).
+           Con position: fixed eso lo dejaba del alto de su contenido:
+           stretch hace que ocupe de top: 0 a bottom: 0, todo el alto. */
+        align-self: stretch;
+        border-radius: var(--radio) 0 0 var(--radio);
+        overflow-y: auto;         /* si hay muchos discos, se baja adentro del panel */
+        z-index: 200;
+        transform: translateX(100%);
+        visibility: hidden;       /* cerrado: tampoco se puede llegar con Tab */
+        /* Al CERRAR: se desliza 0,3s y recién después (0s de duración, 0,3s de espera)
+           pasa a hidden. Así se lo ve mientras sale. */
+        transition: transform 0.3s, visibility 0s 0.3s;
+    }
+
+    /* Abierto: vuelve a su lugar (se desliza gracias a transition).
+       Al ABRIR, visibility cambia al instante (sin espera): si no, durante
+       un momento seguiría "hidden" y no se le podría poner el foco al ✕. */
+    body.carrito-abierto .carrito {
+        transform: translateX(0);
+        visibility: visible;
+        transition: transform 0.3s, visibility 0s;
+    }
+
+    /* En el panel sí se ve el botón ✕ */
+    .boton-cerrar {
+        display: block;
+    }
+
+    /* Fondo oscuro semitransparente que tapa la página */
+    .fondo-carrito {
+        display: block;
+        position: fixed;
+        inset: 0;                 /* ocupa toda la ventana */
+        background-color: rgba(5, 13, 28, 0.6);
+        z-index: 150;             /* entre la página y el carrito */
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0s 0.3s;   /* igual que el carrito */
+    }
+
+    body.carrito-abierto .fondo-carrito {
+        opacity: 1;
+        visibility: visible;
+        transition: opacity 0.3s, visibility 0s;
+    }
+
+    /* Con el carrito abierto, la página de atrás no se mueve */
+    body.carrito-abierto {
+        overflow: hidden;
+    }
+}
+
+/* --- Tablet: 768px o más --- */
+@media (min-width: 768px) {
+    /* El buscador vuelve a la misma fila que el logo */
+    .buscador {
+        order: 0;
+        width: auto;
+        flex: 1;
+        max-width: 420px;
+    }
+
+    /* Dos columnas: filtros (220px) | productos (el resto).
+       El carrito ocupa las dos columnas, abajo. */
+    .principal {
+        grid-template-columns: 220px 1fr;
+    }
+
+    .carrito {
+        grid-column: 1 / -1;  /* desde la primera hasta la última columna */
+    }
+
+    .grilla-productos {
+        grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    }
+}
+
+/* --- Computadora: 1024px o más --- */
+@media (min-width: 1024px) {
+    /* Tres columnas: filtros | productos | carrito */
+    .principal {
+        grid-template-columns: 220px 1fr 300px;
+    }
+
+    .carrito {
+        grid-column: auto;    /* vuelve a ocupar una sola columna */
+        position: sticky;     /* el carrito te sigue al bajar */
+        top: 16px;
+    }
+
+    .categorias {
+        justify-content: center;
+    }
+}
